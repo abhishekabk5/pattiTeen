@@ -7,14 +7,11 @@ import android.content.Intent
 import android.net.NetworkInfo
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
-import android.util.Log
 import com.example.pattiteen.connect.client.ClientConnectionThread
 import com.example.pattiteen.connect.client.ClientHandler
 import com.example.pattiteen.connect.server.ServerConnectionThread
 import com.example.pattiteen.connect.server.ServerHandler
 import com.example.pattiteen.util.Utils
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 
 @SuppressLint("MissingPermission")
 class PlayerConnectManager(
@@ -86,10 +83,7 @@ class PlayerConnectManager(
             // peers connected to the Wi-Fi P2P network.
         }
 
-        if (peers.isEmpty()) {
-            Utils.showToast("No devices found")
-            return@PeerListListener
-        }
+        Utils.showToast("${peers.size} devices found")
     }
 
     private val connectionListener = WifiP2pManager.ConnectionInfoListener { info ->
@@ -104,6 +98,10 @@ class PlayerConnectManager(
             Utils.showToast("Connecting to server...")
             ClientConnectionThread(Utils.getUserName(), groupOwnerAddress, clientHandler).start()
         }
+    }
+
+    fun connectToPeers() {
+//        manager.req
     }
 }
 

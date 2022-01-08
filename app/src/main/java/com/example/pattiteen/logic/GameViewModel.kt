@@ -46,6 +46,10 @@ class GameViewModel(
         manager.peersUpdateListener = peerUpdate
     }
 
+    fun startGame() {
+        manager.connectToPeers()
+    }
+
     val peersCount = MutableLiveData(0)
     private var state = CardsState()
 

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">pattiTeen</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="chaal">CHAAL</string>
+    <string name="blind">BLIND</string>
+    <string name="chaal_string">Chaal: %s</string>
+    <string name="pot_string">Pot: %s</string>
+    <string name="double_">Double</string>
+    <string name="pack">Pack</string>
+</resources>

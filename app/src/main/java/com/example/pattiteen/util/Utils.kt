@@ -25,7 +25,7 @@ object Utils {
     fun showToast(message: String) = mainThreadHandler.post {
         toast?.cancel()
         toast = Toast.makeText(application, message, Toast.LENGTH_SHORT)
-        toast?.show()
+            .apply { show() }
     }
 
     fun setUserName(username: String) {

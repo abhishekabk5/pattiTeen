@@ -10,6 +10,8 @@ object Utils {
         application = app
     }
 
+    private var toast: Toast? = null
+
     private const val PREFS_FILE = "patti3"
     private val prefManager by lazy {
         application.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
@@ -18,7 +20,9 @@ object Utils {
     private const val PREF_USERNAME = "username"
 
     fun showToast(message: String) {
-        Toast.makeText(application, message, Toast.LENGTH_SHORT).show()
+        toast?.cancel()
+        toast = Toast.makeText(application, message, Toast.LENGTH_SHORT)
+        toast?.show()
     }
 
     fun setUserName(username: String) {

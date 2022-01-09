@@ -35,6 +35,7 @@ class GameViewModel(
         }
     })
 
+    val peersCount = MutableLiveData(0)
     private val peerUpdate = object: PeersUpdateListener {
         override fun onPeersUpdate(peers: List<WifiP2pDevice>) {
             peersCount.value = peers.size
@@ -50,7 +51,10 @@ class GameViewModel(
         manager.connectToPeers()
     }
 
-    val peersCount = MutableLiveData(0)
+    fun onPeerCountClick() {
+        manager.checkForPeers()
+    }
+
     private var state = CardsState()
 
     private var chaal = 2

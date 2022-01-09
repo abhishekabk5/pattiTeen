@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.NetworkInfo
+import android.net.wifi.WpsInfo
+import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import com.example.pattiteen.connect.client.ClientConnectionThread
@@ -39,6 +41,7 @@ class PlayerConnectManager(
                 if (networkInfo?.isConnected == true) {
                     manager.requestConnectionInfo(channel, connectionListener)
                 }
+                Utils.showToast("Network Info: Connected - ${networkInfo?.isConnected} ")
             }
             WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> {
 //                (activity.supportFragmentManager.findFragmentById(R.id.frag_list) as DeviceListFragment)
@@ -55,7 +58,6 @@ class PlayerConnectManager(
     fun init(serverHandler: ServerHandler, clientHandler: ClientHandler) {
         this.serverHandler = serverHandler
         this.clientHandler = clientHandler
-        callDiscover()
     }
 
     fun callDiscover() {
@@ -92,20 +94,42 @@ class PlayerConnectManager(
 
     private val connectionListener = WifiP2pManager.ConnectionInfoListener { info ->
 
-        // String from WifiP2pInfo struct
-        val groupOwnerAddress = info.groupOwnerAddress.hostAddress
+        if (info.groupFormed) return@ConnectionInfoListener
 
-        if (info.groupFormed && info.isGroupOwner) {
+        // String from WifiP2pInfo struct
+        val groupOwnerAddress = info.groupOwnerAddress?.hostAddress
+
+        if (info.isGroupOwner) {
             Utils.showToast("Hosting server...")
             ServerConnectionThread(peers.size, serverHandler).start()
-        } else if (info.groupFormed) {
+        } else {
             Utils.showToast("Connecting to server...")
             ClientConnectionThread(Utils.getUserName(), groupOwnerAddress, clientHandler).start()
         }
     }
 
-    fun connectToPeers() {
+    fun checkForPeers() {
         manager.requestPeers(channel, peerListListener)
+    }
+
+    fun connectToPeers() {
+        val configs = peers.map {
+            WifiP2pConfig().apply {
+                deviceAddress = it.deviceAddress
+                wps.setup = WpsInfo.PBC
+            }
+        }
+        for (config in configs) {
+            manager.connect(channel, config, object: WifiP2pManager.ActionListener {
+                override fun onSuccess() {
+                    Utils.showToast("Connect to ${config.deviceAddress} success")
+                }
+
+                override fun onFailure(reasonCode: Int) {
+                    Utils.showToast("Connect to ${config.deviceAddress} failed: $reasonCode")
+                }
+            })
+        }
     }
 }
 

@@ -45,7 +45,8 @@ class PlayFragment : Fragment() {
             binding.potAmount.text = context?.getString(R.string.pot_string, it.toString())
         })
 
-        binding.chaalSiren.setOnClickListener { viewModel.onCardsSeen()}
+        binding.chaalSiren.setOnClickListener { viewModel.onCardsSeen() }
+        binding.countText.setOnClickListener { viewModel.onPeerCountClick() }
         binding.doubleBtn.setOnClickListener { viewModel.onDoubleClick() }
         binding.contiuneBtn.setOnClickListener { viewModel.onChaalClick() }
         binding.packBtn.setOnClickListener { viewModel.onPackClick() }

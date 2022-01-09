@@ -1,11 +1,13 @@
 package com.example.pattiteen
 
+import android.Manifest
 import android.content.Context
 import android.content.IntentFilter
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -48,15 +50,13 @@ class MainActivity : AppCompatActivity() {
         binding.fab.setOnClickListener {
             viewModel.startGame()
         }
+
+        getPermissions()
     }
 
     private fun setupBroadcast() {
         manager = getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager
         channel = manager.initialize(this, mainLooper, null)
-    }
-
-    override fun onResume() {
-        super.onResume()
         val intentFilter = IntentFilter().apply {
             addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
             addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
@@ -66,9 +66,32 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(connectionManager, intentFilter)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onDestroy() {
+        super.onDestroy()
         unregisterReceiver(connectionManager)
+    }
+
+    private fun getPermissions() {
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                    // Precise location access granted.
+                }
+                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                    // Only approximate location access granted.
+                }
+                else -> {
+                    // No location access granted.
+                }
+            }
+        }.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

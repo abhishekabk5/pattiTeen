@@ -101,7 +101,7 @@ class PlayerConnectManager(
     }
 
     fun connectToPeers() {
-//        manager.req
+        manager.requestPeers(channel, peerListListener)
     }
 }
 

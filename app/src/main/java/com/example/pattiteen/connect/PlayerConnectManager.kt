@@ -55,6 +55,10 @@ class PlayerConnectManager(
     fun init(serverHandler: ServerHandler, clientHandler: ClientHandler) {
         this.serverHandler = serverHandler
         this.clientHandler = clientHandler
+        callDiscover()
+    }
+
+    fun callDiscover() {
         manager.discoverPeers(channel, object : WifiP2pManager.ActionListener {
             override fun onSuccess() {
                 Utils.showToast("Discover Success")

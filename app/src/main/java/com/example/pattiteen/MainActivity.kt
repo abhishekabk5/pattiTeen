@@ -77,13 +77,14 @@ class MainActivity : AppCompatActivity() {
         ) { permissions ->
             when {
                 permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    // Precise location access granted.
+                    connectionManager.callDiscover()
                 }
                 permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                     // Only approximate location access granted.
                 }
                 else -> {
-                    // No location access granted.
+                    Utils.showToast("Please give permissions")
+                    getPermissions()
                 }
             }
         }.launch(

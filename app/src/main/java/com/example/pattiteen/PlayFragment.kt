@@ -31,10 +31,16 @@ class PlayFragment : Fragment() {
             binding.countText.text = it.toString()
         })
 
+        viewModel.isMyTurn.observe(viewLifecycleOwner, {
+            binding.doubleBtn.isEnabled = it
+            binding.contiuneBtn.isEnabled = it
+            binding.packBtn.isEnabled = it
+        })
+
         viewModel.cardsSeen.observe(viewLifecycleOwner, {
-            val imageRes = if(it) R.drawable.seen else R.drawable.blind
+            val imageRes = if (it) R.drawable.seen else R.drawable.blind
             binding.chaalSiren.setImageResource(imageRes)
-            val chaalString = if(it) R.string.chaal else R.string.blind
+            val chaalString = if (it) R.string.chaal else R.string.blind
             binding.contiuneBtn.text = context?.getString(chaalString)
         })
 

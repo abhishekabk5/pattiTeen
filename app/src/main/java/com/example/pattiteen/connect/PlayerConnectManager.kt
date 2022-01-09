@@ -36,21 +36,17 @@ class PlayerConnectManager(
                 manager.requestPeers(channel, peerListListener)
             }
             WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION -> {
-                val networkInfo = intent
-                    .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO) as? NetworkInfo
+                val networkInfo: NetworkInfo? = intent
+                    .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO)
                 if (networkInfo?.isConnected == true) {
                     manager.requestConnectionInfo(channel, connectionListener)
                 }
                 Utils.showToast("Network Info: Connected - ${networkInfo?.isConnected} ")
             }
             WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> {
-//                (activity.supportFragmentManager.findFragmentById(R.id.frag_list) as DeviceListFragment)
-//                    .apply {
-//                        updateThisDevice(
-//                            intent.getParcelableExtra(
-//                                WifiP2pManager.EXTRA_WIFI_P2P_DEVICE) as WifiP2pDevice
-//                        )
-//                    }
+                val thisDevice: WifiP2pDevice? = intent
+                    .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE)
+                thisDevice?.deviceName?.let { Utils.setUserName(it, false) }
             }
         }
     }

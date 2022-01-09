@@ -21,6 +21,7 @@ object Utils {
     }
 
     private const val PREF_USERNAME = "username"
+    private const val USERNAME_DEFAULT = "Mangal"
 
     fun showToast(message: String) = mainThreadHandler.post {
         toast?.cancel()
@@ -28,11 +29,12 @@ object Utils {
             .apply { show() }
     }
 
-    fun setUserName(username: String) {
+    fun setUserName(username: String, override: Boolean = true) {
+        if (!override && getUserName() == USERNAME_DEFAULT) return
         prefManager.edit().putString(PREF_USERNAME, username).apply()
     }
 
-    fun getUserName(default: String = "Mangal"): String {
+    fun getUserName(default: String = USERNAME_DEFAULT): String {
         return prefManager.getString(PREF_USERNAME, default) ?: default
     }
 }

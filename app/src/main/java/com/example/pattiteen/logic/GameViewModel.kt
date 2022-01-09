@@ -10,7 +10,8 @@ import com.example.pattiteen.connect.PeersUpdateListener
 import com.example.pattiteen.connect.PlayerConnectManager
 import com.example.pattiteen.connect.client.ClientHandler
 import com.example.pattiteen.connect.server.ServerHandler
-import com.example.pattiteen.model.CardsState
+import com.example.pattiteen.model.*
+import com.example.pattiteen.util.Utils
 
 
 class GameViewModelFactory(private val repo: PlayerConnectManager): ViewModelProvider.NewInstanceFactory() {
@@ -55,42 +56,49 @@ class GameViewModel(
         manager.checkForPeers()
     }
 
-    private var state = CardsState()
+    private var game: GameState
+    private var playerInfo = PlayerInfo(Utils.getUserName())
+    private var state = PlayerState()
 
-    private var chaal = 2
-    private var addedToPot = 0
-    private var potTotal = 0
+    init {
+        game = GameState(userOrderList = arrayListOf(state))
+    }
 
+    val isMyTurn = MutableLiveData(true)
     val cardsSeen = MutableLiveData(false)
     val chaalAmount = MutableLiveData(0)
     val potAmount = MutableLiveData(0)
 
+    private fun handleGameState(gameState: GameState) {
+        chaalAmount.value = gameState.chaal
+        potAmount.value = gameState.potTotal
+        gameState.userOrderList.getOrNull(playerInfo.orderIndex)?.let { playerState ->
+            state = playerState
+            if (playerState.cardsState == CardsState.SEEN) cardsSeen.value = true
+        }
+        isMyTurn.value = playerInfo.orderIndex == gameState.currPlayer
+    }
+
     fun onCardsSeen() {
-        state.seen = true
-        cardsSeen.value = state.seen
+        if (state.cardsState != CardsState.BLIND) return
+        state.cardsState = CardsState.SEEN
+        if (state.cardsState == CardsState.SEEN) cardsSeen.value = true
     }
 
     fun onChaalClick() {
-        val chips = if (state.seen) chaal else chaal / 2
-        playChips(chips)
+        playTurn(PlayerActionType.CHAAL, false)
     }
 
     fun onDoubleClick() {
-        chaal *= 2
-        val chips = if (state.seen) chaal else chaal / 2
-        playChips(chips)
-        chaalAmount.value = chaal
-    }
-
-    private fun playChips(chips: Int) {
-        addedToPot += chips
-        // send chaal signal
-        potTotal += chips
-        potAmount.value = potTotal
+        playTurn(PlayerActionType.CHAAL, true)
     }
 
     fun onPackClick() {
-        // send pack signal
-        state.packed = true
+        playTurn(PlayerActionType.PACK)
+    }
+
+    private fun playTurn(type: PlayerActionType, double: Boolean = false) {
+        val action = PlayerAction(type, double)
+//        manager.sendEvent(TurnActionDto(state, action))
     }
 }

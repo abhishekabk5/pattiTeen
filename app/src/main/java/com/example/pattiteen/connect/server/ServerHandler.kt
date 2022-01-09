@@ -5,14 +5,13 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import com.example.pattiteen.connect.EventHandler
-import com.example.pattiteen.model.GameState
 
 class ServerHandler(
     private val eventHandler: EventHandler
 ): Handler(Looper.getMainLooper()) {
     override fun handleMessage(msg: Message) {
         super.handleMessage(msg)
-        val messageData: Bundle = msg.getData()
+        val messageData: Bundle = msg.data
         eventHandler.handleMessage(messageData)
 //        val gameObject: Any? = messageData.getSerializable(Constants.DATA_KEY)
 //        if (gameObject is PlayerInfo) {
@@ -33,10 +32,8 @@ class ServerHandler(
     }
 
     fun sendToAll(gameObject: Any) {
-        for((socket, username) in ServerConnectionThread.socketUserMap) {
-            if (username != (gameObject as? GameState)?.username) {
-                ServerSenderThread(socket, gameObject).start()
-            }
+        for(socket in ServerConnectionThread.socketUserMap.keys) {
+            ServerSenderThread(socket, gameObject).start()
         }
     }
 }

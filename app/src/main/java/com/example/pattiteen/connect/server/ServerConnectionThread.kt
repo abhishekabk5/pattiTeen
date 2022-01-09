@@ -1,15 +1,15 @@
 package com.example.pattiteen.connect.server
 
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Message
+import com.example.pattiteen.connect.EventHandler
+import com.example.pattiteen.model.GameState
+import com.example.pattiteen.util.Utils
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
-import android.os.Bundle
-import android.os.Message
-import com.example.pattiteen.connect.EventHandler
-import com.example.pattiteen.connect.server.ServerConnectionThread.Companion.socketUserMap
-import com.example.pattiteen.model.GameState
 
 
 class ServerConnectionThread(
@@ -21,6 +21,7 @@ class ServerConnectionThread(
         try {
             serverSocket = ServerSocket(SocketServerPORT)
             serverStarted = true
+            Utils.showToast("Server started")
             while (true) {
                 val socket = serverSocket?.accept() ?: continue
                 if (!allPlayersJoined) {

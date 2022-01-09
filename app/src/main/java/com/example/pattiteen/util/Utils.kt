@@ -2,6 +2,8 @@ package com.example.pattiteen.util
 
 import android.app.Application
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 
 object Utils {
@@ -10,6 +12,7 @@ object Utils {
         application = app
     }
 
+    private var mainThreadHandler = Handler(Looper.getMainLooper())
     private var toast: Toast? = null
 
     private const val PREFS_FILE = "patti3"
@@ -19,7 +22,7 @@ object Utils {
 
     private const val PREF_USERNAME = "username"
 
-    fun showToast(message: String) {
+    fun showToast(message: String) = mainThreadHandler.post {
         toast?.cancel()
         toast = Toast.makeText(application, message, Toast.LENGTH_SHORT)
         toast?.show()

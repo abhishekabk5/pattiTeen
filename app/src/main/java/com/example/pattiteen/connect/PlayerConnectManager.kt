@@ -94,13 +94,12 @@ class PlayerConnectManager(
 
     private val connectionListener = WifiP2pManager.ConnectionInfoListener { info ->
 
-        if (info.groupFormed) return@ConnectionInfoListener
+        if (!info.groupFormed) return@ConnectionInfoListener
 
         // String from WifiP2pInfo struct
         val groupOwnerAddress = info.groupOwnerAddress?.hostAddress
 
         if (info.isGroupOwner) {
-            Utils.showToast("Hosting server...")
             ServerConnectionThread(peers.size, serverHandler).start()
         } else {
             Utils.showToast("Connecting to server...")

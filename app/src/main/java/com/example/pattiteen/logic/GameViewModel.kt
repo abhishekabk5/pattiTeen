@@ -56,6 +56,8 @@ class GameViewModel(
         manager.checkForPeers()
     }
 
+    //                                ----- ^Game Handle Logic^ -----
+
     private var game: GameState
     private var playerInfo = PlayerInfo(Utils.getUserName())
     private var state = PlayerState()
@@ -63,6 +65,8 @@ class GameViewModel(
     init {
         game = GameState(userOrderList = arrayListOf(state))
     }
+
+    //                              ------ \/View State Logic\/ ------
 
     val isMyTurn = MutableLiveData(true)
     val cardsSeen = MutableLiveData(false)

@@ -1,18 +1,16 @@
 package com.example.pattiteen.logic
 
-import android.net.wifi.p2p.WifiP2pDevice
 import android.os.Bundle
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.example.pattiteen.connect.EventHandler
-import com.example.pattiteen.connect.PeersUpdateListener
 import com.example.pattiteen.connect.PlayerConnectManager
 import com.example.pattiteen.connect.client.ClientHandler
 import com.example.pattiteen.connect.server.ServerHandler
 import com.example.pattiteen.model.*
+import com.example.pattiteen.util.Constants
 import com.example.pattiteen.util.Utils
-
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 
 class GameViewModelFactory(private val repo: PlayerConnectManager): ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -26,26 +24,36 @@ class GameViewModel(
 
     private val serverHandler = ServerHandler(object: EventHandler {
         override fun handleMessage(message: Bundle) {
-
+            when(message.getInt(Constants.ACTION_KEY, Constants.ACTION_INVALID)) {
+                Constants.PLAYER_LIST_UPDATE ->
+                    message.getParcelable<PlayerInfo>(Constants.KEY_PLAYER_INFO)
+                        ?.let { handleNewPlayer(it) }
+            }
+            message.getParcelable<GameState>(Constants.KEY_GAME_STATE)
+                ?.let { handleGameState(it) }
+            message.getParcelable<TurnActionDto>(Constants.KEY_PLAYER_ACTION)
+                ?.let { handlePlayerAction(it) }
         }
     })
 
     private val clientHandler = ClientHandler(object: EventHandler {
         override fun handleMessage(message: Bundle) {
-
+            message.getParcelable<GameState>(Constants.KEY_GAME_STATE)
+                ?.let { handleGameState(it) }
+            message.getParcelableArrayList<PlayerInfo>(Constants.KEY_PLAYER_LIST)
+                ?.let { handlePlayerList(it) }
         }
     })
 
-    val peersCount = MutableLiveData(0)
-    private val peerUpdate = object: PeersUpdateListener {
-        override fun onPeersUpdate(peers: List<WifiP2pDevice>) {
-            peersCount.value = peers.size
+    val peersCount = liveData {
+        while(true) {
+            manager.peersList.collect { emit(it.size) }
+            delay(1000L)
         }
     }
 
     init {
         manager.init(serverHandler, clientHandler)
-        manager.peersUpdateListener = peerUpdate
     }
 
     fun startGame() {
@@ -56,13 +64,43 @@ class GameViewModel(
         manager.checkForPeers()
     }
 
+    private fun handleNewPlayer(newPlayer: PlayerInfo) {
+        playerList.add(newPlayer)
+        serverHandler.sendToAll(playerList)
+    }
+
+    private fun handlePlayerList(list: List<PlayerInfo>) {
+        playerList.apply { clear(); addAll(list) }
+        playerInfo.orderIndex = list.indexOfFirst { it.username == playerInfo.username }
+    }
+
+    private fun handlePlayerAction(turnActionDto: TurnActionDto) {
+        game.userOrderList.getOrNull(turnActionDto.orderIndex)?.apply {
+            this.cardsState = turnActionDto.state.cardsState
+            if (turnActionDto.action.type == PlayerActionType.PACK) return@apply
+            if (turnActionDto.action.double) game.chaal *= 2
+            this.potAmount += game.chaal
+            game.potTotal += game.chaal
+        }
+        while(game.userOrderList.getOrNull(game.currPlayer)?.cardsState != CardsState.PACKED) {
+            game.currPlayer++
+            game.currPlayer = game.currPlayer % game.userOrderList.size
+            if (game.currPlayer == turnActionDto.orderIndex) break
+            // todo: end game
+        }
+        serverHandler.sendToAll(game)
+        handleGameState(game)
+    }
+
     //                                ----- ^Game Handle Logic^ -----
 
+    private var playerList: ArrayList<PlayerInfo>
     private var game: GameState
     private var playerInfo = PlayerInfo(Utils.getUserName())
     private var state = PlayerState()
 
     init {
+        playerList = arrayListOf(playerInfo)
         game = GameState(userOrderList = arrayListOf(state))
     }
 
@@ -74,6 +112,7 @@ class GameViewModel(
     val potAmount = MutableLiveData(0)
 
     private fun handleGameState(gameState: GameState) {
+        game = gameState
         chaalAmount.value = gameState.chaal
         potAmount.value = gameState.potTotal
         gameState.userOrderList.getOrNull(playerInfo.orderIndex)?.let { playerState ->
@@ -90,7 +129,7 @@ class GameViewModel(
     }
 
     fun onChaalClick() {
-        playTurn(PlayerActionType.CHAAL, false)
+        playTurn(PlayerActionType.CHAAL)
     }
 
     fun onDoubleClick() {
@@ -102,7 +141,8 @@ class GameViewModel(
     }
 
     private fun playTurn(type: PlayerActionType, double: Boolean = false) {
-        val action = PlayerAction(type, double)
-//        manager.sendEvent(TurnActionDto(state, action))
+        val action = TurnActionDto(playerInfo.orderIndex, state, PlayerAction(type, double))
+        val handled = clientHandler.sendToServer(action)
+        if (!handled) handlePlayerAction(action)
     }
 }

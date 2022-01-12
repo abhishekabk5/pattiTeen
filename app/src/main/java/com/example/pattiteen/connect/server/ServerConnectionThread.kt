@@ -1,6 +1,6 @@
 package com.example.pattiteen.connect.server
 
-import com.example.pattiteen.util.Utils
+import com.example.pattiteen.util.Logr
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
@@ -15,7 +15,7 @@ class ServerConnectionThread(
         try {
             serverSocket = ServerSocket(SocketServerPORT)
             serverStarted = true
-            Utils.showToast("Server started")
+            Logr.i("Server started")
             while (true) {
                 val socket = serverSocket?.accept() ?: continue
                 if (!allPlayersJoined) {

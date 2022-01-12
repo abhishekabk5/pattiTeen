@@ -13,7 +13,9 @@ import com.example.pattiteen.connect.client.ClientConnectionThread
 import com.example.pattiteen.connect.client.ClientHandler
 import com.example.pattiteen.connect.server.ServerConnectionThread
 import com.example.pattiteen.connect.server.ServerHandler
+import com.example.pattiteen.util.Logr
 import com.example.pattiteen.util.Utils
+import kotlinx.coroutines.flow.flow
 
 @SuppressLint("MissingPermission")
 class PlayerConnectManager(
@@ -41,7 +43,7 @@ class PlayerConnectManager(
                 if (networkInfo?.isConnected == true) {
                     manager.requestConnectionInfo(channel, connectionListener)
                 }
-                Utils.showToast("Network Info: Connected - ${networkInfo?.isConnected} ")
+                Logr.i("Network Info: Connected - ${networkInfo?.isConnected} ")
             }
             WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION -> {
                 val thisDevice: WifiP2pDevice? = intent
@@ -59,17 +61,19 @@ class PlayerConnectManager(
     fun callDiscover() {
         manager.discoverPeers(channel, object : WifiP2pManager.ActionListener {
             override fun onSuccess() {
-                Utils.showToast("Discover Success")
+                Logr.i("Discover Success")
             }
 
             override fun onFailure(reasonCode: Int) {
-                Utils.showToast("Discover Failed: $reasonCode")
+                Logr.i("Discover Failed: $reasonCode")
             }
         })
     }
 
     private val peers = mutableListOf<WifiP2pDevice>()
-    var peersUpdateListener: PeersUpdateListener? = null
+    val peersList = flow<List<WifiP2pDevice>> {
+        emit(peers)
+    }
     private val peerListListener = WifiP2pManager.PeerListListener { peerList ->
         val refreshedPeers = peerList.deviceList
         if (refreshedPeers != peers) {
@@ -79,13 +83,12 @@ class PlayerConnectManager(
             // If an AdapterView is backed by this data, notify it
             // of the change. For instance, if you have a ListView of
             // available peers, trigger an update.
-            peersUpdateListener?.onPeersUpdate(peers)
 
             // Perform any other updates needed based on the new list of
             // peers connected to the Wi-Fi P2P network.
         }
 
-        Utils.showToast("${peers.size} devices found")
+        Logr.i("${peers.size} devices found")
     }
 
     private val connectionListener = WifiP2pManager.ConnectionInfoListener { info ->
@@ -98,7 +101,7 @@ class PlayerConnectManager(
         if (info.isGroupOwner) {
             ServerConnectionThread(peers.size, serverHandler).start()
         } else {
-            Utils.showToast("Connecting to server...")
+            Logr.i("Connecting to server...")
             ClientConnectionThread(Utils.getUserName(), groupOwnerAddress, clientHandler).start()
         }
     }
@@ -117,17 +120,13 @@ class PlayerConnectManager(
         for (config in configs) {
             manager.connect(channel, config, object: WifiP2pManager.ActionListener {
                 override fun onSuccess() {
-                    Utils.showToast("Connect to ${config.deviceAddress} success")
+                    Logr.i("Connect to ${config.deviceAddress} success")
                 }
 
                 override fun onFailure(reasonCode: Int) {
-                    Utils.showToast("Connect to ${config.deviceAddress} failed: $reasonCode")
+                    Logr.i("Connect to ${config.deviceAddress} failed: $reasonCode")
                 }
             })
         }
     }
-}
-
-interface PeersUpdateListener {
-    fun onPeersUpdate(peers: List<WifiP2pDevice>)
 }

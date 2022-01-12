@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Utils.init(application)
         setupBroadcast()
 
         binding = ActivityMainBinding.inflate(layoutInflater)

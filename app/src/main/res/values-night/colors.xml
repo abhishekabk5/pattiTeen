@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chaal_button_bg">@color/white</color>
+    <color name="chaal_button_text">@color/black</color>
+</resources>

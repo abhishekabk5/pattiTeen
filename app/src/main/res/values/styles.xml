@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Button.Chaal" parent="TextAppearance.AppCompat.Button">
+        <item name="android:backgroundTint">@color/chaal_button_bg</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/chaal_button_text</item>
+        <item name="android:textSize">48sp</item>
+    </style>
+</resources>

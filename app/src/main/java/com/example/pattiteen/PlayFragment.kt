@@ -33,7 +33,7 @@ class PlayFragment : Fragment() {
 
         viewModel.isMyTurn.observe(viewLifecycleOwner, {
             binding.doubleBtn.isEnabled = it
-            binding.contiuneBtn.isEnabled = it
+            binding.continueBtn.isEnabled = it
             binding.packBtn.isEnabled = it
         })
 
@@ -41,7 +41,7 @@ class PlayFragment : Fragment() {
             val imageRes = if (it) R.drawable.seen else R.drawable.blind
             binding.chaalSiren.setImageResource(imageRes)
             val chaalString = if (it) R.string.chaal else R.string.blind
-            binding.contiuneBtn.text = context?.getString(chaalString)
+            binding.continueBtn.text = context?.getString(chaalString)
         })
 
         viewModel.chaalAmount.observe(viewLifecycleOwner, {
@@ -54,7 +54,7 @@ class PlayFragment : Fragment() {
         binding.chaalSiren.setOnClickListener { viewModel.onCardsSeen() }
         binding.countText.setOnClickListener { viewModel.onPeerCountClick() }
         binding.doubleBtn.setOnClickListener { viewModel.onDoubleClick() }
-        binding.contiuneBtn.setOnClickListener { viewModel.onChaalClick() }
+        binding.continueBtn.setOnClickListener { viewModel.onChaalClick() }
         binding.packBtn.setOnClickListener { viewModel.onPackClick() }
     }
 }

@@ -16,7 +16,7 @@ class ClientHandler(
 
     fun sendToServer(gameObject: Any): Boolean {
         ClientConnectionThread.socket?.let {
-            ClientSenderThread(it, gameObject).start()
+            ClientSenderThread(it.first, it.second, gameObject).start()
             return true
         }
         return false

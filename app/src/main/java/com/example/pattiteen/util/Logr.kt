@@ -1,6 +1,5 @@
 package com.example.pattiteen.util
 
-import android.util.Log
 import com.mocklets.pluto.PlutoLog
 
 object Logr {
@@ -9,7 +8,5 @@ object Logr {
     fun i(msg: String) { i(TAG, msg) }
     fun i(tag: String, msg: String) {
         PlutoLog.i(tag, msg)
-        Log.i(tag, msg)
-        Utils.showToast("$tag: $msg")
     }
 }

@@ -17,16 +17,19 @@ class ClientListenerThread (
 ) : Thread() {
     override fun run() {
         try {
+            val serverStream = ObjectInputStream(socket.getInputStream())
             while (true) {
+//                if (serverStream.available() == 0) {
+//                    sleep(THREAD_SLEEP_MILLIS)
+//                    continue
+//                }
                 val data = Bundle()
-                val serverObject = ObjectInputStream(socket.getInputStream()).readObject() as Any
-                (serverObject as? String)?.let { Logr.i("S: $it") }
+                val serverObject = serverStream.readObject() as Any
+                Logr.i("S: $serverObject")
                 if (serverObject is ArrayList<*>) {
                     data.putParcelableArrayList(
                         Constants.KEY_PLAYER_LIST,
-                        ArrayList<PlayerInfo>().apply {
-                            serverObject.forEach { (it as? PlayerInfo)?.let { info -> add(info) } }
-                        }
+                        ArrayList(serverObject.mapNotNull { it as? PlayerInfo })
                     )
                 } else if (serverObject is GameState) {
                     data.putParcelable(Constants.KEY_GAME_STATE, serverObject)
@@ -42,4 +45,7 @@ class ClientListenerThread (
         }
     }
 
+    companion object {
+        private const val THREAD_SLEEP_MILLIS = 100L
+    }
 }

@@ -28,6 +28,7 @@ class GameViewModel(
                 Constants.PLAYER_LIST_UPDATE ->
                     message.getParcelable<PlayerInfo>(Constants.KEY_PLAYER_INFO)
                         ?.let { handleNewPlayer(it) }
+                Constants.GAME_START -> startGameInternal()
             }
             message.getParcelable<GameState>(Constants.KEY_GAME_STATE)
                 ?.let { handleGameState(it) }
@@ -58,6 +59,11 @@ class GameViewModel(
 
     fun startGame() {
         manager.connectToPeers()
+    }
+
+    private fun startGameInternal() {
+        game.userOrderList.addAll(playerList.map { PlayerState() })
+        serverHandler.sendToAll(game)
     }
 
     fun onPeerCountClick() {
@@ -101,7 +107,7 @@ class GameViewModel(
 
     init {
         playerList = arrayListOf(playerInfo)
-        game = GameState(userOrderList = arrayListOf(state))
+        game = GameState()
     }
 
     //                              ------ \/View State Logic\/ ------

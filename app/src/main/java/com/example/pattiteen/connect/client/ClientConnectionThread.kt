@@ -4,6 +4,7 @@ import android.os.Handler
 import com.example.pattiteen.connect.server.ServerConnectionThread
 import com.example.pattiteen.model.PlayerInfo
 import java.io.IOException
+import java.io.ObjectOutputStream
 import java.net.Socket
 import java.net.UnknownHostException
 
@@ -18,14 +19,15 @@ class ClientConnectionThread(
         if (socket == null) {
             try {
                 if (serverAddress != null) {
-                    socket = Socket(serverAddress, dstPort).also {
-                        if (it.isConnected) {
-                            serverStarted = true
-                            ClientListenerThread(it, clientHandler).start()
-                            val playerInfo = PlayerInfo(userName)
-                            ClientSenderThread(it, playerInfo).start()
-                        }
+                    val server = Socket(serverAddress, dstPort)
+                    val outputStream = ObjectOutputStream(server.getOutputStream())
+                    if (server.isConnected) {
+                        serverStarted = true
+                        ClientListenerThread(server, clientHandler).start()
+                        val playerInfo = PlayerInfo(userName)
+                        ClientSenderThread(server, outputStream, playerInfo).start()
                     }
+                    socket = server to outputStream
                 }
             } catch (e: UnknownHostException) {
                 e.printStackTrace()
@@ -36,7 +38,7 @@ class ClientConnectionThread(
     }
 
     companion object {
-        var socket: Socket? = null
+        var socket: Pair<Socket, ObjectOutputStream>? = null
         var serverStarted = false
     }
 }

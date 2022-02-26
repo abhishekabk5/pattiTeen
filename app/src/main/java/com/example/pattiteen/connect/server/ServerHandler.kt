@@ -16,8 +16,8 @@ class ServerHandler(
     }
 
     fun sendToAll(gameObject: Any) {
-        for(socket in ServerConnectionThread.socketUserMap.keys) {
-            ServerSenderThread(socket, gameObject).start()
+        for(socket in ServerConnectionThread.socketUserMap.values) {
+            ServerSenderThread(socket.first, gameObject).start()
         }
     }
 }

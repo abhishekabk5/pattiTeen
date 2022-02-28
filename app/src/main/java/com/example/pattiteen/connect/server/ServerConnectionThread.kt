@@ -34,6 +34,7 @@ class ServerConnectionThread(
                     if (socketUserMap.size == playerCount) {
                         allPlayersJoined = true
                         serverHandler.handleMessage(Message().apply { data = Bundle().apply {
+                            putInt(Constants.KEY_PLAYER_COUNT, playerCount + 1)
                             putInt(Constants.ACTION_KEY, Constants.GAME_START)
                         }})
                     }

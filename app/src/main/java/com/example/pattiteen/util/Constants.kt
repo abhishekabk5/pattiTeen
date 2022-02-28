@@ -2,6 +2,7 @@ package com.example.pattiteen.util
 
 object Constants {
     // -------
+    const val KEY_PLAYER_COUNT = "player_count"
     const val KEY_PLAYER_INFO = "player_info"
     const val KEY_PLAYER_LIST = "player_list"
     const val KEY_GAME_STATE = "game_state"

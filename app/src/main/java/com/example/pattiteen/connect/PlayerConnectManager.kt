@@ -13,6 +13,7 @@ import com.example.pattiteen.connect.client.ClientConnectionThread
 import com.example.pattiteen.connect.client.ClientHandler
 import com.example.pattiteen.connect.server.ServerConnectionThread
 import com.example.pattiteen.connect.server.ServerHandler
+import com.example.pattiteen.model.PlayerInfo
 import com.example.pattiteen.util.Logr
 import com.example.pattiteen.util.Utils
 import kotlinx.coroutines.flow.flow
@@ -22,6 +23,8 @@ class PlayerConnectManager(
     private val manager: WifiP2pManager,
     private val channel: WifiP2pManager.Channel
 ) : BroadcastReceiver() {
+
+    private lateinit var playerInfo: PlayerInfo
 
     private lateinit var serverHandler: ServerHandler
     private lateinit var clientHandler: ClientHandler
@@ -53,7 +56,8 @@ class PlayerConnectManager(
         }
     }
 
-    fun init(serverHandler: ServerHandler, clientHandler: ClientHandler) {
+    fun init(playerInfo: PlayerInfo, serverHandler: ServerHandler, clientHandler: ClientHandler) {
+        this.playerInfo = playerInfo
         this.serverHandler = serverHandler
         this.clientHandler = clientHandler
     }
@@ -102,7 +106,7 @@ class PlayerConnectManager(
             ServerConnectionThread(peers.size, serverHandler).start()
         } else {
             Logr.i("Connecting to server...")
-            ClientConnectionThread(Utils.getUserName(), groupOwnerAddress, clientHandler).start()
+            ClientConnectionThread(playerInfo, groupOwnerAddress, clientHandler).start()
         }
     }
 

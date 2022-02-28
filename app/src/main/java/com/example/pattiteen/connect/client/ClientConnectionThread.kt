@@ -10,7 +10,7 @@ import java.net.UnknownHostException
 
 
 class ClientConnectionThread(
-    private val userName: String,
+    private val playerInfo: PlayerInfo,
     private val serverAddress: String?,
     private val clientHandler: Handler
 ) : Thread() {
@@ -24,7 +24,6 @@ class ClientConnectionThread(
                     if (server.isConnected) {
                         serverStarted = true
                         ClientListenerThread(server, clientHandler).start()
-                        val playerInfo = PlayerInfo(userName)
                         senderThread = ClientSenderThread(server, ObjectOutputStream(server.getOutputStream())).apply {
                             start()
                             addMessage(playerInfo)

@@ -9,7 +9,7 @@ data class GameState(
     var chaal: Int = 5,
     var potTotal: Int = 0,
     val userOrderList: ArrayList<PlayerState> = arrayListOf(),
-    var currPlayer: Int = 0
+    var currPlayer: Int = -1
 ) : Serializable, Parcelable
 
 

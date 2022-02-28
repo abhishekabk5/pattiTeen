@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import com.example.pattiteen.databinding.FragmentPlayBinding
 import com.example.pattiteen.logic.GameViewModel
 import com.example.pattiteen.logic.GameViewModelFactory
+import com.example.pattiteen.util.Utils.setEnable
 
 class PlayFragment : Fragment() {
 
@@ -32,9 +33,9 @@ class PlayFragment : Fragment() {
         })
 
         viewModel.isMyTurn.observe(viewLifecycleOwner, {
-            binding.doubleBtn.isEnabled = it
-            binding.continueBtn.isEnabled = it
-            binding.packBtn.isEnabled = it
+            binding.doubleBtn.setEnable(it)
+            binding.continueBtn.setEnable(it)
+            binding.packBtn.setEnable(it)
         })
 
         viewModel.cardsSeen.observe(viewLifecycleOwner, {

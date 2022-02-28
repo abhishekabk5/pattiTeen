@@ -9,6 +9,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="text_link_blue">#2779F6</color>
+    <color name="text_highlight">#777777</color>
+
     <color name="chaal_button_bg">@color/black</color>
     <color name="chaal_button_text">@color/white</color>
 </resources>

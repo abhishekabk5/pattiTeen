@@ -5,5 +5,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/chaal_button_text</item>
         <item name="android:textSize">48sp</item>
+        <item name="android:textColorHighlight">@color/text_highlight</item>
+        <item name="android:textColorLink">@color/text_link_blue</item>
     </style>
 </resources>

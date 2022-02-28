@@ -23,13 +23,17 @@ class GameViewModel(
     private val manager: PlayerConnectManager
 ) : ViewModel() {
 
+    private var playerInfo = PlayerInfo(Utils.getUserName())
+
     private val serverHandler = ServerHandler(object: EventHandler {
         override fun handleMessage(message: Bundle) {
             when(message.getInt(Constants.ACTION_KEY, Constants.ACTION_INVALID)) {
                 Constants.PLAYER_LIST_UPDATE ->
                     message.getParcelable<PlayerInfo>(Constants.KEY_PLAYER_INFO)
                         ?.let { handleNewPlayer(it) }
-                Constants.GAME_START -> startGameInternal()
+                Constants.GAME_START ->
+                    message.getInt(Constants.KEY_PLAYER_COUNT, -1).takeIf { it != -1 }
+                        ?.let { tryGameStart(it) }
             }
             message.getParcelable<GameState>(Constants.KEY_GAME_STATE)
                 ?.let { handleGameState(it) }
@@ -47,6 +51,10 @@ class GameViewModel(
         }
     })
 
+    init {
+        manager.init(playerInfo, serverHandler, clientHandler)
+    }
+
     val peersCount = liveData {
         while(true) {
             manager.peersList.collect { emit(it.size) }
@@ -54,32 +62,43 @@ class GameViewModel(
         }
     }
 
-    init {
-        manager.init(serverHandler, clientHandler)
+    fun onPeerCountClick() {
+        manager.checkForPeers()
     }
 
     fun startGame() {
         manager.connectToPeers()
     }
 
-    private fun startGameInternal() {
-        playerList.forEachIndexed { i, info -> info.orderIndex = i }
-        game.userOrderList.addAll(playerList.map { PlayerState() })
-        serverHandler.sendToAll(game)
+    private var playerCount = -1
+    private fun tryGameStart(playerCount: Int) {
+        this.playerCount = playerCount
+        if (playerList.size == playerCount)
+            startGameInternal()
     }
 
-    fun onPeerCountClick() {
-        manager.checkForPeers()
+    private fun startGameInternal() {
+        if (game.currPlayer != -1) return // game already started
+        playerList.forEachIndexed { i, info -> info.orderIndex = i }
+        game.currPlayer = 0
+        game.userOrderList.addAll(playerList.map { PlayerState() })
+        updateGameState(game)
+    }
+
+    private fun updateGameState(game: GameState) {
+        serverHandler.sendToAll(game)
+        handleGameState(game)
     }
 
     private fun handleNewPlayer(newPlayer: PlayerInfo) {
         playerList.add(newPlayer)
         serverHandler.sendToAll(playerList)
+        tryGameStart(playerCount)
     }
 
     private fun handlePlayerList(list: List<PlayerInfo>) {
         playerList.apply { clear(); addAll(list) }
-        playerInfo.orderIndex = list.indexOfFirst { it.username == playerInfo.username }
+        playerInfo.orderIndex = list.indexOfFirst { it.id == playerInfo.id }
     }
 
     private fun handlePlayerAction(turnActionDto: TurnActionDto) {
@@ -90,21 +109,21 @@ class GameViewModel(
             this.potAmount += game.chaal
             game.potTotal += game.chaal
         }
-        while(game.userOrderList.getOrNull(game.currPlayer)?.cardsState != CardsState.PACKED) {
+        do {
             game.currPlayer++
             game.currPlayer = game.currPlayer % game.userOrderList.size
-            if (game.currPlayer == turnActionDto.orderIndex) break
-            // todo: end game
-        }
-        serverHandler.sendToAll(game)
-        handleGameState(game)
+            if (game.currPlayer == turnActionDto.orderIndex) {
+                // todo: end game
+                break
+            }
+        } while(game.userOrderList.getOrNull(game.currPlayer)?.cardsState == CardsState.PACKED)
+        updateGameState(game)
     }
 
     //                                ----- ^Game Handle Logic^ -----
 
     private var playerList: ArrayList<PlayerInfo>
     private var game: GameState
-    private var playerInfo = PlayerInfo(Utils.getUserName())
     private var state = PlayerState()
 
     init {

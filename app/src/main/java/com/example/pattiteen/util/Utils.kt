@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.widget.Button
 import android.widget.Toast
 
 object Utils {
@@ -36,5 +37,10 @@ object Utils {
 
     fun getUserName(default: String = USERNAME_DEFAULT): String {
         return prefManager.getString(PREF_USERNAME, default) ?: default
+    }
+
+    fun Button.setEnable(enabled: Boolean) {
+        alpha = if (enabled) 1.0f else 0.2f
+        isEnabled = enabled
     }
 }

@@ -21,11 +21,11 @@ class ClientListenerThread (
         try {
             val objectStream = ObjectInputStream(socket.getInputStream())
             while (true) {
-                Log.i("stream tag", "length: ${objectStream.available()}")
-                if (objectStream.available() == 0) {
-                    sleep(ClientConnectionThread.CLIENT_THREAD_SLEEP_MILLIS)
-                    continue
-                }
+//                Log.i("stream tag", "length: ${objectStream.available()}")
+//                if (objectStream.available() == 0) {
+//                    sleep(ClientConnectionThread.CLIENT_THREAD_SLEEP_MILLIS)
+//                    continue
+//                }
                 val data = Bundle()
                 var serverObject: Any?
                 try {

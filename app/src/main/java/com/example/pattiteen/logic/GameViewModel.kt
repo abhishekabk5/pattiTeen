@@ -12,6 +12,7 @@ import com.example.pattiteen.util.Utils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 
+@Suppress("UNCHECKED_CAST")
 class GameViewModelFactory(private val repo: PlayerConnectManager): ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return GameViewModel(repo) as T
@@ -49,7 +50,7 @@ class GameViewModel(
     val peersCount = liveData {
         while(true) {
             manager.peersList.collect { emit(it.size) }
-            delay(1000L)
+            delay(500L)
         }
     }
 
@@ -62,6 +63,7 @@ class GameViewModel(
     }
 
     private fun startGameInternal() {
+        playerList.forEachIndexed { i, info -> info.orderIndex = i }
         game.userOrderList.addAll(playerList.map { PlayerState() })
         serverHandler.sendToAll(game)
     }

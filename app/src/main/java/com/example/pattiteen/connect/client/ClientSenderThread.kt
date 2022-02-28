@@ -1,18 +1,17 @@
 package com.example.pattiteen.connect.client
 
-import com.example.pattiteen.connect.server.ServerConnectionThread
 import com.example.pattiteen.util.Logr
 import java.io.IOException
 import java.io.ObjectOutputStream
 import java.net.Socket
-import java.util.concurrent.ArrayBlockingQueue
+import java.util.*
 
 class ClientSenderThread(
     private val hostThreadSocket: Socket,
     private val outputStream: ObjectOutputStream
 ) : Thread() {
 
-    private val msgQ = ArrayBlockingQueue<Any>(1)
+    private val msgQ: Queue<Any> = LinkedList()
     fun addMessage(msg: Any) {
         msgQ.add(msg)
     }

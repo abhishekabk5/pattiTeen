@@ -22,11 +22,11 @@ class ServerListenerThread(
         try {
             val objectStream = ObjectInputStream(hostThreadSocket.getInputStream())
             while (true) {
-                Log.i("stream tag", "length: ${objectStream.available()}")
-                if (objectStream.available() == 0) {
-                    sleep(SERVER_THREAD_SLEEP_MILLIS)
-                    continue
-                }
+//                Log.i("stream tag", "length: ${objectStream.available()}")
+//                if (objectStream.available() == 0) {
+//                    sleep(SERVER_THREAD_SLEEP_MILLIS)
+//                    continue
+//                }
                 var gameObject: Any?
                 try {
                     gameObject = objectStream.readObject()

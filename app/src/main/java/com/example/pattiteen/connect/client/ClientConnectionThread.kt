@@ -20,17 +20,17 @@ class ClientConnectionThread(
             try {
                 if (serverAddress != null) {
                     val server = Socket(serverAddress, dstPort)
-                    val outputStream = ObjectOutputStream(server.getOutputStream())
+                    var senderThread: ClientSenderThread? = null
                     if (server.isConnected) {
                         serverStarted = true
                         ClientListenerThread(server, clientHandler).start()
                         val playerInfo = PlayerInfo(userName)
-                        ClientSenderThread(server, outputStream).apply {
+                        senderThread = ClientSenderThread(server, ObjectOutputStream(server.getOutputStream())).apply {
                             start()
                             addMessage(playerInfo)
                         }
                     }
-                    socket = server to outputStream
+                    socket = server to senderThread
                 }
             } catch (e: UnknownHostException) {
                 e.printStackTrace()
@@ -42,7 +42,7 @@ class ClientConnectionThread(
 
     companion object {
         const val CLIENT_THREAD_SLEEP_MILLIS = 100L
-        var socket: Pair<Socket, ObjectOutputStream>? = null
+        var socket: Pair<Socket, ClientSenderThread?>? = null
         var serverStarted = false
     }
 }

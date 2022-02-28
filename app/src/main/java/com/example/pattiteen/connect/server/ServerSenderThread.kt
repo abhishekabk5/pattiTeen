@@ -4,13 +4,12 @@ import com.example.pattiteen.util.Logr
 import java.io.IOException
 import java.io.ObjectOutputStream
 import java.util.*
-import java.util.concurrent.ArrayBlockingQueue
 
 class ServerSenderThread(
     private val outputStream: ObjectOutputStream
 ) : Thread() {
 
-    private val msgQ = ArrayBlockingQueue<Any>(1)
+    private val msgQ: Queue<Any> = LinkedList()
     fun addMessage(msg: Any) {
         msgQ.add(msg)
     }

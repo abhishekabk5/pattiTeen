@@ -39,11 +39,6 @@ class ServerListenerThread(
                     is PlayerInfo -> {
                         data.putParcelable(Constants.KEY_PLAYER_INFO, gameObject)
                         data.putInt(Constants.ACTION_KEY, Constants.PLAYER_LIST_UPDATE)
-                        ServerConnectionThread.socketUserMap[hostThreadSocket]?.first
-                            ?.let {
-                                ServerConnectionThread.socketUserMap[hostThreadSocket] =
-                                    it to gameObject
-                            }
                     }
                     is GameState -> data.putParcelable(Constants.KEY_GAME_STATE, gameObject)
                     is TurnActionDto -> data.putParcelable(Constants.KEY_PLAYER_ACTION, gameObject)

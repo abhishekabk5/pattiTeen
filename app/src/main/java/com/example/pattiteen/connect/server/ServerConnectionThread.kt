@@ -29,7 +29,7 @@ class ServerConnectionThread(
                         start()
                         addMessage("pattiTeen")
                     }
-                    socketUserMap[socket] = serverSender to null
+                    socketUserMap[socket] = serverSender
 
                     if (socketUserMap.size == playerCount) {
                         allPlayersJoined = true
@@ -47,7 +47,7 @@ class ServerConnectionThread(
     companion object {
         const val SocketServerPORT = 8080
         const val SERVER_THREAD_SLEEP_MILLIS = 50L
-        var socketUserMap: HashMap<Socket, Pair<ServerSenderThread, PlayerInfo?>> = HashMap()
+        var socketUserMap: HashMap<Socket, ServerSenderThread> = HashMap()
         var serverStarted = false
         var serverSocket: ServerSocket? = null
         var allPlayersJoined = false

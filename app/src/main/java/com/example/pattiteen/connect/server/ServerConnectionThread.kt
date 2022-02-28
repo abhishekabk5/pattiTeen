@@ -25,9 +25,11 @@ class ServerConnectionThread(
                 val socket = serverSocket?.accept() ?: continue
                 if (!allPlayersJoined) {
                     ServerListenerThread(socket, serverHandler).start()
-                    val outputStream = ObjectOutputStream(socket.getOutputStream())
-                    ServerSenderThread(outputStream, "pattiTeen").start()
-                    socketUserMap[socket] = outputStream to null
+                    val serverSender = ServerSenderThread(ObjectOutputStream(socket.getOutputStream())).apply {
+                        start()
+                        addMessage("pattiTeen")
+                    }
+                    socketUserMap[socket] = serverSender to null
 
                     if (socketUserMap.size == playerCount) {
                         allPlayersJoined = true
@@ -44,7 +46,8 @@ class ServerConnectionThread(
 
     companion object {
         const val SocketServerPORT = 8080
-        var socketUserMap: HashMap<Socket, Pair<ObjectOutputStream, PlayerInfo?>> = HashMap()
+        const val SERVER_THREAD_SLEEP_MILLIS = 50L
+        var socketUserMap: HashMap<Socket, Pair<ServerSenderThread, PlayerInfo?>> = HashMap()
         var serverStarted = false
         var serverSocket: ServerSocket? = null
         var allPlayersJoined = false

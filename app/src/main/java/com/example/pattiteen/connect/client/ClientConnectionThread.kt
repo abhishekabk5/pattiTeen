@@ -25,7 +25,10 @@ class ClientConnectionThread(
                         serverStarted = true
                         ClientListenerThread(server, clientHandler).start()
                         val playerInfo = PlayerInfo(userName)
-                        ClientSenderThread(server, outputStream, playerInfo).start()
+                        ClientSenderThread(server, outputStream).apply {
+                            start()
+                            addMessage(playerInfo)
+                        }
                     }
                     socket = server to outputStream
                 }
@@ -38,6 +41,7 @@ class ClientConnectionThread(
     }
 
     companion object {
+        const val CLIENT_THREAD_SLEEP_MILLIS = 100L
         var socket: Pair<Socket, ObjectOutputStream>? = null
         var serverStarted = false
     }

@@ -10,11 +10,10 @@ import com.example.pattiteen.model.*
 import com.example.pattiteen.util.Constants
 import com.example.pattiteen.util.Utils
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 
 @Suppress("UNCHECKED_CAST")
 class GameViewModelFactory(private val repo: PlayerConnectManager): ViewModelProvider.NewInstanceFactory() {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GameViewModel(repo) as T
     }
 }

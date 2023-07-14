@@ -28,29 +28,29 @@ class PlayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.peersCount.observe(viewLifecycleOwner, {
+        viewModel.peersCount.observe(viewLifecycleOwner) {
             binding.countText.text = it.toString()
-        })
+        }
 
-        viewModel.isMyTurn.observe(viewLifecycleOwner, {
+        viewModel.isMyTurn.observe(viewLifecycleOwner) {
             binding.doubleBtn.setEnable(it)
             binding.continueBtn.setEnable(it)
             binding.packBtn.setEnable(it)
-        })
+        }
 
-        viewModel.cardsSeen.observe(viewLifecycleOwner, {
+        viewModel.cardsSeen.observe(viewLifecycleOwner) {
             val imageRes = if (it) R.drawable.seen else R.drawable.blind
             binding.chaalSiren.setImageResource(imageRes)
             val chaalString = if (it) R.string.chaal else R.string.blind
             binding.continueBtn.text = context?.getString(chaalString)
-        })
+        }
 
-        viewModel.chaalAmount.observe(viewLifecycleOwner, {
+        viewModel.chaalAmount.observe(viewLifecycleOwner) {
             binding.chaalAmount.text = context?.getString(R.string.chaal_string, it.toString())
-        })
-        viewModel.potAmount.observe(viewLifecycleOwner, {
+        }
+        viewModel.potAmount.observe(viewLifecycleOwner) {
             binding.potAmount.text = context?.getString(R.string.pot_string, it.toString())
-        })
+        }
 
         binding.chaalSiren.setOnClickListener { viewModel.onCardsSeen() }
         binding.countText.setOnClickListener { viewModel.onPeerCountClick() }
